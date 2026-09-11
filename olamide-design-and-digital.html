@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olamide Design & Digital</title>
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f7;color:#171717}
+header{background:#111;color:#fff;text-align:center;padding:35px 18px}header h1{margin:0 0 8px;font-size:32px}header p{margin:0;color:#ddd}
+.wrap{max-width:850px;margin:auto;padding:20px}.card{background:#fff;border-radius:18px;padding:22px;margin:18px 0;box-shadow:0 5px 20px rgba(0,0,0,.08)}
+h2{margin-top:0}.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.service{border:1px solid #ddd;border-radius:14px;padding:16px}.service strong{display:block;font-size:18px;margin-bottom:8px}
+label{display:block;font-weight:bold;margin:15px 0 7px}input,select,textarea{width:100%;padding:13px;border:1px solid #ccc;border-radius:10px;font-size:16px}textarea{min-height:110px}
+button{width:100%;border:0;border-radius:12px;padding:15px;font-size:17px;font-weight:bold;cursor:pointer;margin-top:12px}.pay{background:#111;color:#fff}.whatsapp{background:#25D366;color:#fff}
+.note{font-size:13px;color:#666;line-height:1.5}.success{display:none;background:#e9fff0;border:1px solid #8be0a5;padding:14px;border-radius:10px;margin-top:15px}footer{text-align:center;padding:25px;color:#666}
+</style>
+</head>
+<body>
+<header><h1>Olamide Design & Digital</h1><p>Logo • Graphic Design • Website Design • Advert Design</p></header>
+<div class="wrap">
+<div class="card"><h2>Our Services</h2><div class="services">
+<div class="service"><strong>Luxury Advert</strong><span>₦2,000</span></div>
+<div class="service"><strong>Business Advert</strong><span>₦1,500</span></div>
+<div class="service"><strong>Food Advert</strong><span>₦1,500</span></div>
+<div class="service"><strong>Logo / Custom Design</strong><span>Contact us</span></div>
+</div></div>
+<div class="card"><h2>Order Your Design</h2>
+<label>Your name</label><input id="name" type="text" placeholder="Enter your name">
+<label>Email address</label><input id="email" type="email" placeholder="Enter your email">
+<label>Phone / WhatsApp</label><input id="phone" type="tel" placeholder="08012345678">
+<label>Choose a service</label><select id="service">
+<option value="2000">Luxury Advert — ₦2,000</option>
+<option value="1500">Business Advert — ₦1,500</option>
+<option value="1500">Food Advert — ₦1,500</option>
+</select>
+<label>Tell me what you want designed</label><textarea id="details" placeholder="Describe your design, business name, colours, text, pictures, etc."></textarea>
+<button class="pay" onclick="payWithPaystack()">PAY FOR DESIGN</button>
+<button class="whatsapp" onclick="sendWhatsApp()">SEND ORDER ON WHATSAPP</button>
+<div id="success" class="success"></div>
+<p class="note">Payment is processed by Paystack. Never enter your Paystack password, PIN, BVN or NIN on this website.</p>
+</div>
+<div class="card"><h2>Contact</h2><p><strong>WhatsApp:</strong> 08052702885</p><p><strong>Phone:</strong> 08063688675</p><p><strong>Email:</strong> eemmanu145@gmail.com</p></div>
+</div>
+<footer>© 2026 Olamide Design & Digital</footer>
+<script>
+const PAYSTACK_PUBLIC_KEY="PASTE_YOUR_PAYSTACK_PUBLIC_KEY_HERE";
+function getData(){return{
+name:document.getElementById("name").value.trim(),
+email:document.getElementById("email").value.trim(),
+phone:document.getElementById("phone").value.trim(),
+service:document.getElementById("service"),
+details:document.getElementById("details").value.trim()}}
+
+function validate(){const d=getData();if(!d.name||!d.email||!d.phone){alert("Please enter your name, email and phone number.");return null}
+if(!d.email.includes("@")){alert("Please enter a valid email address.");return null}
+if(!d.details){alert("Please describe the design you want.");return null}return d}
+
+function payWithPaystack(){const d=validate();if(!d)return;
+if(PAYSTACK_PUBLIC_KEY==="PASTE_YOUR_PAYSTACK_PUBLIC_KEY_HERE"){alert("Your Paystack public key has not been added yet.");return}
+const amount=Number(d.service.value),serviceName=d.service.options[d.service.selectedIndex].text;
+const popup=new Paystack();popup.checkout({key:PAYSTACK_PUBLIC_KEY,email:d.email,amount:amount*100,currency:"NGN",
+firstName:d.name.split(" ")[0],phone:d.phone,metadata:{custom_fields:[
+{display_name:"Customer name",variable_name:"customer_name",value:d.name},
+{display_name:"Phone",variable_name:"phone",value:d.phone},
+{display_name:"Service",variable_name:"service",value:serviceName},
+{display_name:"Design details",variable_name:"design_details",value:d.details}]},
+onSuccess:(transaction)=>{const box=document.getElementById("success");box.style.display="block";
+box.innerHTML="Payment completed. Reference: <strong>"+transaction.reference+"</strong><br>Please send your design details/images on WhatsApp.";sendWhatsApp(transaction.reference)},
+onCancel:()=>alert("Payment was cancelled. Your order has not been paid for.")})}
+
+function sendWhatsApp(reference=""){const d=getData();const serviceName=d.service.options[d.service.selectedIndex].text;
+const msg="Hello Olamide Design & Digital!\n\nName: "+d.name+"\nEmail: "+d.email+"\nPhone: "+d.phone+"\nService: "+serviceName+"\nDetails: "+d.details+(reference?"\n\nPaystack Reference: "+reference:"");
+window.open("https://wa.me/2348052702885?text="+encodeURIComponent(msg),"_blank")}
+</script>
+</body>
+</html>
